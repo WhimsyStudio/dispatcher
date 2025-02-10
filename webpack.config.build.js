@@ -1,15 +1,14 @@
 const path = require('path');
 const webpack = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
-const getPackageJson = require('./scripts/getPackageJson');
-
+const packageInfo = require('./package.json')
 const {
   version,
   name,
   license,
   repository,
   author,
-} = getPackageJson('version', 'name', 'license', 'repository', 'author');
+} = packageInfo
 
 const banner = `
   ${name} v${version}
@@ -28,7 +27,7 @@ module.exports = {
   output: {
     filename: 'index.js',
     path: path.resolve(__dirname, 'dist'),
-    library: "MyLibrary",
+    library: name,
     libraryTarget: 'umd',
     clean: true
   },
