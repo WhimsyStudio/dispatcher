@@ -2,8 +2,6 @@ const path = require('path');
 const webpack = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const getPackageJson = require('./scripts/getPackageJson');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
 const {
   version,
@@ -29,7 +27,7 @@ module.exports = {
   entry: './src/lib/index.ts',
   output: {
     filename: 'index.js',
-    path: path.resolve(__dirname, 'build'),
+    path: path.resolve(__dirname, 'dist'),
     library: "MyLibrary",
     libraryTarget: 'umd',
     clean: true
@@ -38,7 +36,6 @@ module.exports = {
     minimize: true,
     minimizer: [
       new TerserPlugin({ extractComments: false }),
-      new CssMinimizerPlugin()
     ],
   },
   module: {
@@ -50,19 +47,9 @@ module.exports = {
           loader: 'babel-loader'
         }
       },
-      {
-        test: /\.(sa|sc|c)ss$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          { loader: "css-loader", options: { sourceMap: true } },
-        ],
-      }
     ]
   },
   plugins: [
-    new MiniCssExtractPlugin({
-        filename: 'css/index.css'
-    }),
     new webpack.BannerPlugin(banner)
   ],
   resolve: {

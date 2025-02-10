@@ -1,12 +1,11 @@
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   mode: "development",
   devtool: 'cheap-module-source-map',
-  entry: './src/demo/index.ts',
+  entry: './src/app.ts',
   output: {
-    filename: 'index.js'
+    filename: 'app.js'
   },
   optimization: {
     minimize: false,
@@ -25,20 +24,10 @@ module.exports = {
         use: {
           loader: 'babel-loader'
         }
-      },
-      {
-        test: /\.(sa|sc|c)ss$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          { loader: "css-loader", options: { sourceMap: true } },
-        ],
       }
     ]
   },
   plugins: [
-    new MiniCssExtractPlugin({
-      filename: 'css/index.css'
-    }),
     new HtmlWebpackPlugin(),
   ],
   resolve: {
