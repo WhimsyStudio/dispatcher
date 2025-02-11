@@ -1,4 +1,5 @@
 dist/*
 /**/*.d.ts
 webpack.*.js
+babel.config.js
 node_modules/*

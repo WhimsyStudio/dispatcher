@@ -1,6 +1,5 @@
 const path = require('path');
 const webpack = require('webpack');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const packageInfo = require('./package.json');
 const { version, name, license, repository, author } = packageInfo;
@@ -40,7 +39,7 @@ module.exports = {
       },
     ],
   },
-  plugins: [new webpack.BannerPlugin(banner), new CleanWebpackPlugin()],
+  plugins: [new webpack.BannerPlugin(banner)],
   resolve: {
     extensions: ['.ts', '.js', '.json'],
   },
