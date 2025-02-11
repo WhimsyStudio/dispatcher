@@ -1,15 +1,28 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "noImplicitAny": true,
-    "outDir": "dist/types",
+    "outDir": "dist/@wsys/dispatcher",
+    "declarationDir": "./dist/@wsys/dispatcher/types",
     "module": "esnext",
     "target": "es5",
     "allowJs": true,
     "sourceMap": true,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "lib": ["es2018", "dom"],
-    "moduleResolution": "node"
+    "lib": [
+      "es2018",
+      "dom"
+    ],
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "paths": {
+      "@wsys/*": [
+        "./src/lib/*"
+      ]
+    }
   },
-  "include": ["src/lib"]
+  "include": [
+    "src/lib"
+  ]
 }

@@ -1,2 +1,4 @@
-build/*
+dist/*
 /**/*.d.ts
+webpack.*.js
+node_modules/*
