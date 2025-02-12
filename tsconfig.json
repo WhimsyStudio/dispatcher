@@ -12,7 +12,8 @@
     "emitDeclarationOnly": true,
     "lib": [
       "es2018",
-      "dom"
+      "dom",
+      "WebWorker"
     ],
     "moduleResolution": "node",
     "skipLibCheck": true,
