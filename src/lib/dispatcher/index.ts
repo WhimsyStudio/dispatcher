@@ -71,8 +71,12 @@ class Initiator<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
     [K in keyof OutputEvents]?: (...args: InferParams<OutputEvents, K>) => any;
   } = {};
 
-  constructor(private workerScriptUrl: string) {
-    // this.worker = new Worker(workerScriptUrl);
+  constructor(worker: string | URL | Worker) {
+    if (worker instanceof Worker) {
+      this.worker = worker;
+    } else {
+      this.worker = new Worker(worker);
+    }
     // Process OutputEvents, turn all to promise-like functions
   }
 
@@ -80,10 +84,12 @@ class Initiator<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
     methodName: K,
     args: InferParams<OutputEvents, K>,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
   ): OutputEvents[K] extends PureFunction
     ? PromiseWrapper<ReturnType<OutputEvents[K]>>
     : never {
+    return new Promise((r, j) => {
+      setTimeout(() => r('Gao'), 1000);
+    }) as any;
     // const method = this.methods[methodName];
     // if (method) {
     //   return method(args);
@@ -115,40 +121,4 @@ class Initiator<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
   }
 }
 
-/** Testing Sample **/
-type InputEvents = {
-  COMBINE_MESSAGE: (name: { name: string }) => void;
-  DOUBLE_NUMBER: (a: number) => void;
-  RESERVE_STRING: (data: { str: string }) => void;
-  BEGIN_COUNT: () => void;
-  INIT_CANVAS: (params: {
-    canvas: OffscreenCanvas;
-    transfer: Transferable[];
-  }) => void;
-  DRAW_RECT: (params: { width: number; height: number; color: string }) => void;
-};
-
-type OutputEvents = {
-  COMBINED_MESSAGE: (message: string) => void;
-  DOUBLED_NUMBER: (res: number) => number;
-  RESERVED_STRING: (res: { str: string }) => string;
-  SEND_COUNT: (count: number) => void;
-};
-/**  Processor & Initiator initialize  **/
-const initiator = new Initiator<InputEvents, OutputEvents>('');
-initiator.asPromise('RESERVED_STRING', { str: 'Jack' }).then((res) => {
-  console.log(res);
-});
-initiator.asPromise('DOUBLED_NUMBER', 10).then((n) => {
-  console.log(n);
-});
-initiator.subscribe('COMBINE_MESSAGE', (res) => {
-  console.log(res);
-});
-initiator.emit('DOUBLED_NUMBER', 20);
-const processor = new Processor<InputEvents, OutputEvents>();
-processor.on('COMBINE_MESSAGE', (req, emit) => {
-  console.log(req);
-  emit('COMBINED_MESSAGE', 'lee');
-});
 export { Processor, Initiator };

@@ -29,6 +29,11 @@ module.exports = {
           loader: 'babel-loader',
         },
       },
+      {
+        test: /\.worker\.(js|ts)$/,
+        exclude: /(node_modules|bower_components)/,
+        use: ['worker-loader', 'babel-loader'],
+      },
     ],
   },
   plugins: [
