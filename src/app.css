@@ -6,4 +6,9 @@ body {
 
 body {
     background-color: #2d3436;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    height: 100vh;
 }

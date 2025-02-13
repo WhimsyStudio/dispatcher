@@ -81,7 +81,7 @@ class Initiator<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
   }
 
   /**
-   * @description
+   * @description Call method in Processor in promise-like way.
    */
   asPromise<K extends KeysOfType<OutputEvents>>(
     func: K,
@@ -89,16 +89,16 @@ class Initiator<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
   ): OutputEvents[K] extends PureFunction
     ? PromiseWrapper<ReturnType<OutputEvents[K]>>
     : never {
-    let id = Math.max(Object.keys(this.promiseHandlers).length, 0);
-    id = !id ? id : id + 1;
+    let channel = Math.max(Object.keys(this.promiseHandlers).length, 0);
+    channel = !channel ? channel : channel + 1;
     return new Promise((r, _j) => {
-      this.promiseHandlers[id] = r;
-      this.worker.postMessage({ ev: func, payload: args, id });
+      this.promiseHandlers[channel] = r;
+      this.worker.postMessage({ ev: func, payload: args, channel });
     }) as any;
   }
 
   /**
-   * @description
+   * @description Setup listener for request from Processor.
    */
   on<Ev extends UserEventNames<InputEvents>>(
     ev: Ev,
@@ -108,7 +108,7 @@ class Initiator<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
   }
 
   /**
-   * @description
+   * @description Send request to Processor.
    */
   emit<Ev extends EventNames<OutputEvents>>(
     ev: Ev,
