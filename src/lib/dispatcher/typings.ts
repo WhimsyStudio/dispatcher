@@ -28,7 +28,7 @@ type Callback<
   T extends (...args: any[]) => any,
   Callback extends (...args: any[]) => any,
 > = T extends (...args: infer P) => void
-  ? (...args: [...P, Callback]) => void
+  ? (...args: [...P, Callback, number]) => void
   : never;
 
 type KeysOfType<T> = keyof T;

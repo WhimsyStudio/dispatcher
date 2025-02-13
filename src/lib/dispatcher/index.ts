@@ -13,15 +13,12 @@ import {
 import { Message } from '@wsys/dispatcher/model';
 
 /**
- * @description
+ * @description Works in web worker for process request from Initiator.
  */
 class Processor<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
   private readonly worker!: Worker;
   private handlers: Record<string | symbol, PureFunction> = {};
 
-  /**
-   * @param worker
-   */
   constructor(worker: Worker) {
     this.worker = worker;
     this.worker.onmessage = (ev: MessageEvent<Message>) => {
@@ -29,16 +26,19 @@ class Processor<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
         this.worker,
         ev.data.payload,
         (...args: any[]) => {
-          this.worker.postMessage({ ev: args[0], payload: args[1] });
+          this.worker.postMessage({
+            ev: args[0],
+            payload: args[1],
+            channel: args[2],
+          });
         },
+        ev.data.channel,
       );
     };
   }
 
   /**
-   * @description
-   * @param ev
-   * @param listener
+   * @description Setup listener for handling response from Initiator.
    */
   on<Ev extends UserEventNames<InputEvents>>(
     ev: Ev,
@@ -46,7 +46,7 @@ class Processor<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
       UserListener<InputEvents, Ev>,
       <Ev extends EventNames<OutputEvents>>(
         ev: Ev,
-        ...arg: EventParams<OutputEvents, Ev>
+        ...arg: [...EventParams<OutputEvents, Ev>, undefined | number]
       ) => void
     >,
   ): void {
@@ -55,15 +55,13 @@ class Processor<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
 }
 
 /**
- * @description
+ * @description Works in main javascript thread as callee.
  */
 class Initiator<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
   private readonly worker!: Worker;
   private handlers: Record<string | symbol, PureFunction> = {};
+  private promiseHandlers: Record<number, PureFunction> = {};
 
-  /**
-   * @param worker
-   */
   constructor(worker: string | URL | Worker) {
     if (worker instanceof Worker) {
       this.worker = worker;
@@ -71,14 +69,19 @@ class Initiator<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
       this.worker = new Worker(worker);
     }
     this.worker.onmessage = (ev: MessageEvent<Message>) => {
-      this.handlers[ev.data.ev].call(this.worker, ev.data.payload);
+      if (ev.data.channel !== undefined) {
+        this.promiseHandlers[ev.data.channel].call(
+          this.worker,
+          ev.data.payload,
+        );
+      } else {
+        this.handlers[ev.data.ev].call(this.worker, ev.data.payload);
+      }
     };
   }
 
   /**
    * @description
-   * @param func
-   * @param args
    */
   asPromise<K extends KeysOfType<OutputEvents>>(
     func: K,
@@ -86,17 +89,18 @@ class Initiator<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
   ): OutputEvents[K] extends PureFunction
     ? PromiseWrapper<ReturnType<OutputEvents[K]>>
     : never {
-    return new Promise((r, j) => {
-      setTimeout(() => r('Gao'), 1000);
+    let id = Math.max(Object.keys(this.promiseHandlers).length, 0);
+    id = !id ? id : id + 1;
+    return new Promise((r, _j) => {
+      this.promiseHandlers[id] = r;
+      this.worker.postMessage({ ev: func, payload: args, id });
     }) as any;
   }
 
   /**
    * @description
-   * @param ev
-   * @param listener
    */
-  subscribe<Ev extends UserEventNames<InputEvents>>(
+  on<Ev extends UserEventNames<InputEvents>>(
     ev: Ev,
     listener: UserListener<InputEvents, Ev>,
   ) {
@@ -105,8 +109,6 @@ class Initiator<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
 
   /**
    * @description
-   * @param ev
-   * @param arg
    */
   emit<Ev extends EventNames<OutputEvents>>(
     ev: Ev,
