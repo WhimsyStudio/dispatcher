@@ -1,46 +1,38 @@
-/** Typing Definition **/
-export type EventsMap = {
-  [key: string | number | symbol]: (arg: any) => void;
-};
+import {
+  Callback,
+  EventNames,
+  EventParams,
+  EventsMap,
+  InferParams,
+  KeysOfType,
+  PromiseWrapper,
+  PureFunction,
+  UserEventNames,
+  UserListener,
+} from './typings';
+import { Message } from '@wsys/dispatcher/model';
 
-export type EventNames<Map extends EventsMap> = keyof Map & (string | symbol);
-
-export type EventParams<
-  Map extends EventsMap,
-  Ev extends EventNames<Map>,
-> = Parameters<Map[Ev]>;
-
-export type UserEventNames<UserEvents extends EventsMap> =
-  EventNames<UserEvents>;
-
-export type UserListener<
-  UserEvents extends EventsMap,
-  Ev extends keyof UserEvents,
-> = UserEvents[Ev];
-
-export type PromiseWrapper<Value> =
-  Value extends Promise<any> ? Value : Promise<Value>;
-
-export type PureFunction = (...args: never[]) => never | void;
-
-export type InferParams<E extends EventsMap, K extends keyof EventsMap> =
-  Parameters<E[K]> extends Array<any> ? Parameters<E[K]>[0] : never;
-type AppendCallback<
-  T extends (...args: any[]) => any,
-  Callback extends (...args: any[]) => any,
-> = T extends (...args: infer P) => infer R
-  ? (...args: [...P, Callback]) => R
-  : never;
-
-/** Core Definition **/
 /**
  * @description
  */
 class Processor<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
-  private worker!: Worker;
+  private readonly worker!: Worker;
+  private handlers: Record<string | symbol, PureFunction> = {};
 
-  constructor() {
-    // this.worker = worker;
+  /**
+   * @param worker
+   */
+  constructor(worker: Worker) {
+    this.worker = worker;
+    this.worker.onmessage = (ev: MessageEvent<Message>) => {
+      this.handlers[ev.data.ev].call(
+        this.worker,
+        ev.data.payload,
+        (...args: any[]) => {
+          this.worker.postMessage({ ev: args[0], payload: args[1] });
+        },
+      );
+    };
   }
 
   /**
@@ -50,52 +42,53 @@ class Processor<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
    */
   on<Ev extends UserEventNames<InputEvents>>(
     ev: Ev,
-    listener: AppendCallback<
+    listener: Callback<
       UserListener<InputEvents, Ev>,
       <Ev extends EventNames<OutputEvents>>(
         ev: Ev,
         ...arg: EventParams<OutputEvents, Ev>
       ) => void
     >,
-  ): void {}
+  ): void {
+    this.handlers[ev] = listener;
+  }
 }
-
-type KeysOfType<T> = keyof T;
 
 /**
  * @description
  */
 class Initiator<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
-  private worker!: Worker;
-  private methods: {
-    [K in keyof OutputEvents]?: (...args: InferParams<OutputEvents, K>) => any;
-  } = {};
+  private readonly worker!: Worker;
+  private handlers: Record<string | symbol, PureFunction> = {};
 
+  /**
+   * @param worker
+   */
   constructor(worker: string | URL | Worker) {
     if (worker instanceof Worker) {
       this.worker = worker;
     } else {
       this.worker = new Worker(worker);
     }
-    // Process OutputEvents, turn all to promise-like functions
+    this.worker.onmessage = (ev: MessageEvent<Message>) => {
+      this.handlers[ev.data.ev].call(this.worker, ev.data.payload);
+    };
   }
 
+  /**
+   * @description
+   * @param func
+   * @param args
+   */
   asPromise<K extends KeysOfType<OutputEvents>>(
-    methodName: K,
+    func: K,
     args: InferParams<OutputEvents, K>,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   ): OutputEvents[K] extends PureFunction
     ? PromiseWrapper<ReturnType<OutputEvents[K]>>
     : never {
     return new Promise((r, j) => {
       setTimeout(() => r('Gao'), 1000);
     }) as any;
-    // const method = this.methods[methodName];
-    // if (method) {
-    //   return method(args);
-    // } else {
-    //   throw new Error(`Method ${String(methodName)} does not exist.`);
-    // }
   }
 
   /**
@@ -106,7 +99,9 @@ class Initiator<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
   subscribe<Ev extends UserEventNames<InputEvents>>(
     ev: Ev,
     listener: UserListener<InputEvents, Ev>,
-  ) {}
+  ) {
+    this.handlers[ev] = listener;
+  }
 
   /**
    * @description
@@ -117,7 +112,7 @@ class Initiator<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
     ev: Ev,
     ...arg: EventParams<OutputEvents, Ev>
   ): void {
-    // this.worker.postMessage(ev, arg);
+    this.worker.postMessage({ ev, payload: arg });
   }
 }
 
