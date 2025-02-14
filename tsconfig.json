@@ -24,6 +24,9 @@
     }
   },
   "include": [
-    "src/lib"
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }
