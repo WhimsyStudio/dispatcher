@@ -13,7 +13,7 @@ import {
 import { Message } from '@wsys/dispatcher/model';
 
 /**
- * @description Works in web worker for process request from Initiator.
+ * @description Works in web worker for process request from Provider.
  */
 class Processor<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
   private readonly worker!: Worker;
@@ -24,7 +24,7 @@ class Processor<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
     this.worker.onmessage = (ev: MessageEvent<Message>) => {
       this.handlers[ev.data.ev].call(
         this.worker,
-        ev.data.payload,
+        Array.isArray(ev.data.payload) ? ev.data.payload[0]:ev.data.payload,
         (...args: any[]) => {
           this.worker.postMessage({
             ev: args[0],
@@ -57,7 +57,7 @@ class Processor<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
 /**
  * @description Works in main javascript thread as callee.
  */
-class Initiator<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
+class Provider<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
   private readonly worker!: Worker;
   private handlers: Record<string | symbol, PureFunction> = {};
   private promiseHandlers: Record<number, PureFunction> = {};
@@ -83,9 +83,9 @@ class Initiator<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
   /**
    * @description Call method in Processor in promise-like way.
    */
-  asPromise<K extends KeysOfType<OutputEvents>>(
+  use<K extends KeysOfType<OutputEvents>>(
     func: K,
-    args: InferParams<OutputEvents, K>,
+    arg: InferParams<OutputEvents, K>,
   ): OutputEvents[K] extends PureFunction
     ? PromiseWrapper<ReturnType<OutputEvents[K]>>
     : never {
@@ -93,7 +93,7 @@ class Initiator<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
     channel = !channel ? channel : channel + 1;
     return new Promise((r, _j) => {
       this.promiseHandlers[channel] = r;
-      this.worker.postMessage({ ev: func, payload: args, channel });
+      this.worker.postMessage({ ev: func, payload: arg, channel });
     }) as any;
   }
 
@@ -118,4 +118,4 @@ class Initiator<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
   }
 }
 
-export { Processor, Initiator };
+export { Processor, Provider };

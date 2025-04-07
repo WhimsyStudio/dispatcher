@@ -32,7 +32,16 @@ module.exports = {
       {
         test: /\.worker\.(js|ts)$/,
         exclude: /(node_modules|bower_components)/,
-        use: ['worker-loader', 'babel-loader'],
+        use: [
+          {
+            loader: 'worker-loader',
+            options: {
+              filename: '[name].[contenthash].js', 
+              inline: 'fallback',
+            },
+          },
+          'babel-loader',
+        ],
       },
     ],
   },
