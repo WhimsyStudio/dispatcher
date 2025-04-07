@@ -6,6 +6,7 @@ module.exports = {
   entry: './src/app.ts',
   output: {
     filename: 'app.js',
+    publicPath: '/'
   },
   optimization: {
     minimize: false,

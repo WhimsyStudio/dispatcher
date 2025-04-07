@@ -33,6 +33,7 @@ type Callback<
 
 type KeysOfType<T> = keyof T;
 
+type WorkerInstance<Modules extends {[key: string | symbol]: any}> = typeof globalThis & Modules
 export {
   EventsMap,
   EventNames,
@@ -44,4 +45,5 @@ export {
   InferParams,
   Callback,
   KeysOfType,
+  WorkerInstance
 };
