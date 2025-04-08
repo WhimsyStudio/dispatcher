@@ -1,23 +1,10 @@
 {
-    "compilerOptions": {
-      "baseUrl": ".",
-      "noImplicitAny": true,
-      "outDir": "./build/@wsys/dispatcher",
-      "declarationDir": "./build/@wsys/dispatcher/types",
-      "module": "esnext",
-      "target": "es5",
-      "allowJs": true,
-      "sourceMap": true,
-      "declaration": true,
-      "emitDeclarationOnly": true,
-      "lib": ["es2018", "dom", "WebWorker"],
-      "moduleResolution": "node",
-      "skipLibCheck": true,
-      "paths": {
-        "@wsys/*": ["./src/lib/*"]
-      }
-    },
-    "include": ["./src/lib"],
-    "exclude": ["node_modules","cypress","test"]
-  }
-  
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./build/@wsys/dispatcher",
+    "declarationDir": "./build/@wsys/dispatcher/types",
+    "declaration": true,
+  },
+  "include": ["./src/lib"],
+  "exclude": ["node_modules", "cypress", "test"]
+}
