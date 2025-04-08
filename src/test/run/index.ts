@@ -10,6 +10,6 @@ import * as $ from 'jquery';
       return n * 2;
     },
     [20],
-  );
+  ).future
   $(document.body).append(`<span id="test-res">${res}<span>`);
 })();

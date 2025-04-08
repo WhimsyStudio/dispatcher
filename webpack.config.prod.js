@@ -49,7 +49,6 @@ const umd = {
     path: path.resolve(__dirname, 'build/@wsys/dispatcher/dist'),
     library: 'Dispatcher',
     libraryTarget: 'umd',
-    clean: true,
   },
   module: {
     rules: [
@@ -81,7 +80,6 @@ const esm = {
     library: {
       type: 'module'
     },
-    clean: true,
   },
   module: {
     rules: [

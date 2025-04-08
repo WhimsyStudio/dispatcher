@@ -6,6 +6,6 @@ import { MEvents, WEvents } from './events';
 import * as $ from 'jquery'
 (async () => {
   const provider = new Provider<WEvents, MEvents>(new Worker());
-  const res = await provider.commit('DOUBLE_NUMBER', 20);
+  const res = await provider.commit('DOUBLE_NUMBER', 20).future;
   $(document.body).append(`<span id="test-res">${res}<span>`)
 })();

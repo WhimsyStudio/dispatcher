@@ -1,8 +1,8 @@
 import { Processor } from '@wsys/dispatcher';
-import { TestWorkerInstance } from './typing';
+import { TestWorker } from './typing';
 import { multiply } from 'lodash';
 
-const worker = globalThis as TestWorkerInstance
+const worker = globalThis as TestWorker
 worker.multiply = multiply
 
-new Processor<{}, {}>(self as unknown as Worker);
+new Processor<{}, {}>();

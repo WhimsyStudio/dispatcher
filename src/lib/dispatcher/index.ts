@@ -1,122 +1,106 @@
-type EventsMap = {
-  [key: string | number | symbol]: (arg: any) => void;
+type Task<T> = {
+  future: Promise<T>;
+  cancel: () => void;
 };
 
-type EventNames<Map extends EventsMap> = keyof Map & (string | symbol);
-
-type EventParams<
-  Map extends EventsMap,
-  Ev extends EventNames<Map>,
-> = Parameters<Map[Ev]>;
-
-type UserEventNames<UserEvents extends EventsMap> = EventNames<UserEvents>;
-
-type UserListener<
-  UserEvents extends EventsMap,
-  Ev extends keyof UserEvents,
-> = UserEvents[Ev];
-
-type PromiseWrapper<Value> =
-  Value extends Promise<any> ? Value : Promise<Value>;
-
-type PureFunction = (...args: never[]) => never | void;
-
-type InferParams<E extends EventsMap, K extends keyof EventsMap> =
-  Parameters<E[K]> extends Array<any> ? Parameters<E[K]>[0] : never;
-
-type Callback<
+type EventCallback<
   T extends (...args: any[]) => any,
   Callback extends (...args: any[]) => any,
 > = T extends (...args: infer P) => void
   ? (...args: [...P, Callback, number]) => void
   : never;
 
-type KeysOfType<T> = keyof T;
-
-type WorkerInstance<Modules extends { [key: string | symbol]: any }> =
-  typeof globalThis & Modules;
-
-/**
- * @description Data model for MessageEvent in web worker.
- */
-type Message = {
-  /**
-   * @description Event Name
-   */
+type EventPayload = {
   ev: string | symbol;
-  /**
-   * @description Parameter
-   */
   payload: any;
-  /**
-   * @description Channel ID
-   */
   channel?: number;
 };
 
 /**
+ * @description Map-like for defining events passed between main and web worker
+ */
+type EventMap = {
+  [key: string | symbol]: (arg: any) => void;
+};
+
+/**
+ * @description Utility type for defining extra attributes in web worker
+ */
+type ExtWorker<ExtraAttrs extends { [key: string | symbol]: any }> =
+  typeof globalThis & Worker & ExtraAttrs;
+
+class TaskTimeoutError extends Error {}
+
+/**
  * @description Works in web worker for process request from Provider.
  */
-class Processor<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
-  private readonly worker!: Worker;
-  private handlers: Record<string | symbol, PureFunction> = {};
+class Processor<InputEvents extends EventMap, OutputEvents extends EventMap> {
+  private readonly worker: Worker = (self || globalThis) as unknown as Worker;
+  private handlers: Record<string | symbol, Function> = {};
 
-  constructor(worker: Worker) {
-    this.worker = worker;
-    this.worker.onmessage = (ev: MessageEvent<Message>) => {
+  constructor() {
+    this.worker.onmessage = (ev: MessageEvent<EventPayload>) => {
       if (ev.data.ev === 'RUN') {
         (async function () {}).constructor(ev.data.payload.funcStr)(
           ev.data.payload.args,
         );
         return;
       }
-      this.handlers[ev.data.ev].call(
-        this.worker,
-        Array.isArray(ev.data.payload) ? ev.data.payload[0] : ev.data.payload,
-        (...args: any[]) => {
+      const emit = (...args: any[]) => {
+        if (args.length === 3) {
           this.worker.postMessage({
             ev: args[0],
             payload: args[1],
             channel: args[2],
           });
-        },
-        ev.data.channel,
-      );
+        } else {
+          this.worker.postMessage({
+            ev: args[0],
+            payload: undefined,
+            channel: args[1],
+          });
+        }
+      };
+      if (ev.data.payload) {
+        this.handlers[ev.data.ev].call(
+          this.worker,
+          Array.isArray(ev.data.payload) ? ev.data.payload[0] : ev.data.payload,
+          emit,
+          ev.data.channel,
+        );
+      } else {
+        this.handlers[ev.data.ev].call(this.worker, emit, ev.data.channel);
+      }
     };
   }
 
   /**
    * @description Setup listener for handling response from Initiator.
    */
-  on<Ev extends UserEventNames<InputEvents>>(
+  on<Ev extends keyof InputEvents & (string | symbol)>(
     ev: Ev,
-    listener: Callback<
-      UserListener<InputEvents, Ev>,
-      <Ev extends EventNames<OutputEvents>>(
+    listener: EventCallback<
+      InputEvents[Ev],
+      <Ev extends keyof OutputEvents & (string | symbol)>(
         ev: Ev,
-        ...arg: [...EventParams<OutputEvents, Ev>, undefined | number]
+        ...arg: [...Parameters<OutputEvents[Ev]>, undefined | number]
       ) => void
     >,
   ): void {
     this.handlers[ev] = listener;
   }
 }
-
-class TaskCancellationError extends Error {}
-class TaskTimeoutError extends Error {}
-
-type ExtraReturnFields = { cancel: () => void };
 /**
  * @description Works in main javascript thread as callee.
  */
-class Provider<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
+class Provider<InputEvents extends EventMap, OutputEvents extends EventMap> {
   private readonly worker!: Worker;
-  private handlers: Record<string | symbol, PureFunction> = {};
+  private handlers: Record<string | symbol, Function> = {};
   private runHandlers: Record<
     string | symbol,
     { reject: Function; resolve: Function }
   > = {};
-  private promiseHandlers: Record<number, PureFunction> = {};
+  private promiseHandlers: Record<number, Function> = {};
 
   constructor(worker: string | URL | Worker) {
     if (worker instanceof Worker) {
@@ -124,7 +108,7 @@ class Provider<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
     } else {
       this.worker = new Worker(worker);
     }
-    this.worker.onmessage = (ev: MessageEvent<Message>) => {
+    this.worker.onmessage = (ev: MessageEvent<EventPayload>) => {
       if (ev.data.ev === 'RUN_RES' && ev.data.channel !== undefined) {
         const handler = this.runHandlers[ev.data.channel];
         handler.resolve(ev.data.payload);
@@ -146,24 +130,27 @@ class Provider<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
    * @param ev Event to be fired
    * @param arg Execute Arguments
    */
-  commit<K extends KeysOfType<OutputEvents>>(
+  commit<K extends keyof OutputEvents>(
     ev: K,
-    arg?: InferParams<OutputEvents, K>,
+    arg?: Parameters<OutputEvents[K]> extends Array<any>
+      ? Parameters<OutputEvents[K]>[0]
+      : never,
     opts?: { timeout?: number },
-  ): OutputEvents[K] extends PureFunction
-    ? PromiseWrapper<ReturnType<OutputEvents[K]>>
+  ): OutputEvents[K] extends Function
+    ? Task<ReturnType<OutputEvents[K]>>
     : never {
     let channel = Math.max(Object.keys(this.promiseHandlers).length, 0);
     channel = !channel ? channel : channel + 1;
-    return new Promise((r, j) => {
+    const future = new Promise((r, j) => {
       this.promiseHandlers[channel] = r;
       this.worker.postMessage({ ev: ev, payload: arg, channel });
-      if(opts && opts.timeout){
-         setTimeout(()=>{
-            j(new TaskTimeoutError(`Task exceeded ${opts.timeout}ms`))
-         },opts.timeout)
+      if (opts && opts.timeout) {
+        setTimeout(() => {
+          j(new TaskTimeoutError(`Task exceeded ${opts.timeout}ms`));
+        }, opts.timeout);
       }
-    }) as any;
+    });
+    return { future, cancel: () => {} } as any;
   }
 
   /**
@@ -171,9 +158,9 @@ class Provider<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
    * @param ev Event to be fired
    * @param listener Callback for event
    */
-  on<Ev extends UserEventNames<InputEvents>>(
+  on<Ev extends keyof InputEvents & (string | symbol)>(
     ev: Ev,
-    listener: UserListener<InputEvents, Ev>,
+    listener: InputEvents[Ev],
   ) {
     this.handlers[ev] = listener;
   }
@@ -183,9 +170,9 @@ class Provider<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
    * @param ev Event to be fired
    * @param arg Execute Arguments
    */
-  emit<Ev extends EventNames<OutputEvents>>(
+  emit<Ev extends keyof OutputEvents & (string | symbol)>(
     ev: Ev,
-    arg: EventParams<OutputEvents, Ev>,
+    arg: Parameters<OutputEvents[Ev]>,
   ): void {
     this.worker.postMessage({ ev, payload: arg });
   }
@@ -206,61 +193,38 @@ class Provider<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
     ) => T,
     params?: Readonly<[...D]>,
     opts?: { timeout?: number },
-  ): Promise<T> & ExtraReturnFields {
-    let capturedReject: undefined | ((e: unknown) => void);
-    const promise: Promise<T> & Partial<ExtraReturnFields> = new Promise(
-      async (resolve, reject) => {
-        try {
-          capturedReject = reject;
-          const awaitedDeps = await Promise.all(params ?? []);
-          const args = awaitedDeps.map((d) => {
-            return d;
-          });
-          let channel = Math.max(Object.keys(this.runHandlers).length, 0);
-          channel = !channel ? channel : channel + 1;
-          this.runHandlers[channel] = { reject, resolve };
-          const funcStr = `Promise.all(arguments[0]).then(deps => (${func.toString()})(...deps)).then(r=>postMessage({ev:'RUN_RES',payload:r,channel:${channel}})).catch(e=>postMessage({$__error:e}))`;
+  ): Task<T> {
+    const promise: Promise<T> = new Promise(async (resolve, reject) => {
+      try {
+        const awaitedDeps = await Promise.all(params ?? []);
+        const args = awaitedDeps.map((d) => {
+          return d;
+        });
+        let channel = Math.max(Object.keys(this.runHandlers).length, 0);
+        channel = !channel ? channel : channel + 1;
+        this.runHandlers[channel] = { reject, resolve };
+        const funcStr = `Promise.all(arguments[0]).then(deps => (${func.toString()})(...deps)).then(r=>postMessage({ev:'RUN_RES',payload:r,channel:${channel}})).catch(e=>postMessage({$__error:e}))`;
 
-          if (opts?.timeout != null) {
-            setTimeout(
-              () =>
-                reject(new TaskTimeoutError(`Task exceeded ${opts.timeout}ms`)),
-              opts.timeout,
-            );
-          }
-
-          this.worker.postMessage({
-            ev: 'RUN',
-            payload: { funcStr, args },
-            channel,
-          });
-        } catch (e) {
-          reject(e);
+        if (opts?.timeout != null) {
+          setTimeout(
+            () =>
+              reject(new TaskTimeoutError(`Task exceeded ${opts.timeout}ms`)),
+            opts.timeout,
+          );
         }
-      },
-    );
 
-    promise.cancel = () => {
-      capturedReject?.(new TaskCancellationError('Task cancelled'));
-    };
-
-    return promise as Promise<T> & ExtraReturnFields;
+        this.worker.postMessage({
+          ev: 'RUN',
+          payload: { funcStr, args },
+          channel,
+        });
+      } catch (e) {
+        reject(e);
+      }
+    });
+    return { future: promise as Promise<T>, cancel: () => {} };
   }
 }
 
-export type {
-  EventsMap,
-  EventNames,
-  EventParams,
-  UserEventNames,
-  UserListener,
-  PromiseWrapper,
-  PureFunction,
-  InferParams,
-  Callback,
-  KeysOfType,
-  WorkerInstance,
-  Message,
-};
-
+export type { EventMap, ExtWorker, Task };
 export { Processor, Provider };

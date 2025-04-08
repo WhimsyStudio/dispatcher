@@ -8,6 +8,7 @@ module.exports = {
     run:'./src/test/run/index.ts',
     thirdparty:'./src/test/thirdparty/index.ts',
     timeout:'./src/test/timeout/index.ts',
+    parameter:'./src/test/parameter/index.ts',
   },
   output: {
     filename: '[name].[hash].js',
@@ -23,10 +24,6 @@ module.exports = {
   },
   module: {
     rules: [
-      {
-        test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
-      },
       {
         test: /\.([mjt])s$/,
         exclude: /(node_modules|bower_components)/,
@@ -88,6 +85,12 @@ module.exports = {
       template: './src/index.html',
       filename:'timeout.html',
       chunks: ['timeout']
+    }),
+    new HtmlWebpackPlugin({
+      title: 'Dispatcher',
+      template: './src/index.html',
+      filename:'parameter.html',
+      chunks: ['parameter']
     }),
   ],
   resolve: {
