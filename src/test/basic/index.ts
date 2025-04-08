@@ -1,8 +1,7 @@
 import { Provider } from '@wsys/dispatcher';
-import './app.css';
 // eslint-disable-next-line
 // @ts-expect-error
-import Worker from './dispatcher.worker';
+import Worker from './index.worker';
 import { MEvents, WEvents } from './events';
 import { WorkerInstance } from '@wsys/dispatcher/typings';
 

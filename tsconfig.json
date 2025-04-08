@@ -10,23 +10,14 @@
     "sourceMap": true,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "lib": [
-      "es2018",
-      "dom",
-      "WebWorker"
-    ],
+    "lib": ["es2018", "dom", "WebWorker"],
     "moduleResolution": "node",
     "skipLibCheck": true,
     "paths": {
-      "@wsys/*": [
-        "./src/lib/*"
-      ]
-    }
+      "@wsys/*": ["./src/lib/*"]
+    },
+    "types": ["cypress"]
   },
-  "include": [
-    "src/**/*.ts",
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src/**/*.ts", "cypress"],
+  "exclude": ["node_modules"]
 }

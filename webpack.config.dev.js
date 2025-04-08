@@ -3,10 +3,11 @@ const path = require('path');
 module.exports = {
   mode: 'development',
   devtool: 'cheap-module-source-map',
-  entry: './src/app.ts',
+  entry: {
+    index:'./src/test/basic/index.ts',
+  },
   output: {
-    filename: 'app.js',
-    publicPath: '/'
+    filename: '[name].[hash].js',
   },
   optimization: {
     minimize: false,
@@ -50,7 +51,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Dispatcher',
       template: './src/index.html',
-      favicon: './src/favicon.ico',
+      inject: true,
+      filename:'basic.html',
+      chunks: ['index']
     }),
   ],
   resolve: {
