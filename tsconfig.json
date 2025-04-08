@@ -14,10 +14,10 @@
     "moduleResolution": "node",
     "skipLibCheck": true,
     "paths": {
-      "@wsys/*": ["./src/lib/*"]
+      "@wsys/*": ["./lib/*"]
     },
-    "types": ["cypress"]
+    "types": ["cypress", "jquery"]
   },
-  "include": ["src/**/*.ts", "cypress"],
+  "include": ["lib", "test", "cypress"],
   "exclude": ["node_modules"]
 }

@@ -4,7 +4,8 @@ module.exports = {
   mode: 'development',
   devtool: 'cheap-module-source-map',
   entry: {
-    index:'./src/test/basic/index.ts',
+    basic:'./test/basic/index.ts',
+    run:'./test/run/index.ts',
   },
   output: {
     filename: '[name].[hash].js',
@@ -50,15 +51,20 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       title: 'Dispatcher',
-      template: './src/index.html',
-      inject: true,
+      template: './index.html',
       filename:'basic.html',
-      chunks: ['index']
+      chunks: ['basic']
+    }),
+    new HtmlWebpackPlugin({
+      title: 'Dispatcher',
+      template: './index.html',
+      filename:'run.html',
+      chunks: ['run']
     }),
   ],
   resolve: {
     alias: {
-      '@wsys': path.resolve(__dirname, 'src', 'lib'),
+      '@wsys': path.resolve(__dirname,'lib'),
     },
     extensions: ['.ts', '.js', '.json'],
   },
