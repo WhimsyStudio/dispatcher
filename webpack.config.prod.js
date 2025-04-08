@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const packageInfo = require('./package.json');
 const { version, name, license, repository, author } = packageInfo;
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const banner = `
   ${name} v${version}
@@ -19,22 +20,37 @@ module.exports = {
   entry: './src/lib/dispatcher/index.ts',
   output: {
     filename: 'index.js',
-    path: path.resolve(__dirname, 'dist/@wsys/dispatcher'),
+    path: path.resolve(__dirname, 'build/@wsys/dispatcher'),
     library: name,
     libraryTarget: 'umd',
     clean: true,
   },
   optimization: {
     minimize: true,
-    minimizer: [new TerserPlugin({ extractComments: false })],
+    minimizer: [new TerserPlugin({
+      extractComments: false,
+      terserOptions: {
+        format: {
+          comments: /@wsys\/dispatcher/
+        },
+      }
+    })],
   },
   module: {
     rules: [
       {
         test: /\.([mjt])s$/,
-        exclude: /(node_modules|bower_components)/,
+        exclude: [
+          /(node_modules|bower_components)/,
+        ],
         use: {
           loader: 'babel-loader',
+          options: {
+            presets: [
+              '@babel/preset-env',
+              '@babel/preset-typescript',
+            ],
+          },
         },
       },
     ],
@@ -42,5 +58,10 @@ module.exports = {
   plugins: [new webpack.BannerPlugin(banner)],
   resolve: {
     extensions: ['.ts', '.js', '.json'],
+    plugins: [
+      new TsconfigPathsPlugin({
+        configFile: path.resolve(__dirname, 'tsconfig.build.json'),
+      }),
+    ],
   },
 };

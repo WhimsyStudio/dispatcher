@@ -1,0 +1,7 @@
+{
+    "name": "@wsys/dispatcher",
+    "version": "0.0.1.alpha-1",
+    "description": "SocketIO Style Web Worker Framework",
+    "main": "index.js",
+    "types": "index.d.ts"
+}

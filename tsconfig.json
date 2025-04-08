@@ -2,8 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "noImplicitAny": true,
-    "outDir": "dist/@wsys/dispatcher",
-    "declarationDir": "./dist/@wsys/dispatcher/types",
+    "outDir": "dist",
     "module": "esnext",
     "target": "es5",
     "allowJs": true,
@@ -14,10 +13,10 @@
     "moduleResolution": "node",
     "skipLibCheck": true,
     "paths": {
-      "@wsys/*": ["./lib/*"]
+      "@wsys/*": ["./src/lib/*"]
     },
-    "types": ["cypress", "jquery"]
+    "types": ["cypress","jquery"]
   },
-  "include": ["lib", "test", "cypress"],
+  "include": ["src/**/*.ts", "cypress"],
   "exclude": ["node_modules"]
 }

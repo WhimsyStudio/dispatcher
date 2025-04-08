@@ -1,16 +1,58 @@
-import {
-  Callback,
-  EventNames,
-  EventParams,
-  EventsMap,
-  InferParams,
-  KeysOfType,
-  PromiseWrapper,
-  PureFunction,
-  UserEventNames,
-  UserListener,
-} from './typings';
-import { Message } from '@wsys/dispatcher/model';
+type EventsMap = {
+  [key: string | number | symbol]: (arg: any) => void;
+};
+
+type EventNames<Map extends EventsMap> = keyof Map & (string | symbol);
+
+type EventParams<
+  Map extends EventsMap,
+  Ev extends EventNames<Map>,
+> = Parameters<Map[Ev]>;
+
+type UserEventNames<UserEvents extends EventsMap> = EventNames<UserEvents>;
+
+type UserListener<
+  UserEvents extends EventsMap,
+  Ev extends keyof UserEvents,
+> = UserEvents[Ev];
+
+type PromiseWrapper<Value> =
+  Value extends Promise<any> ? Value : Promise<Value>;
+
+type PureFunction = (...args: never[]) => never | void;
+
+type InferParams<E extends EventsMap, K extends keyof EventsMap> =
+  Parameters<E[K]> extends Array<any> ? Parameters<E[K]>[0] : never;
+
+type Callback<
+  T extends (...args: any[]) => any,
+  Callback extends (...args: any[]) => any,
+> = T extends (...args: infer P) => void
+  ? (...args: [...P, Callback, number]) => void
+  : never;
+
+type KeysOfType<T> = keyof T;
+
+type WorkerInstance<Modules extends { [key: string | symbol]: any }> =
+  typeof globalThis & Modules;
+
+/**
+ * @description Data model for MessageEvent in web worker.
+ */
+type Message = {
+  /**
+   * @description Event Name
+   */
+  ev: string | symbol;
+  /**
+   * @description Parameter
+   */
+  payload: any;
+  /**
+   * @description Channel ID
+   */
+  channel?: number;
+};
 
 /**
  * @description Works in web worker for process request from Provider.
@@ -83,7 +125,7 @@ class Provider<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
       this.worker = new Worker(worker);
     }
     this.worker.onmessage = (ev: MessageEvent<Message>) => {
-      if (ev.data.ev === 'RUN_RES') {
+      if (ev.data.ev === 'RUN_RES' && ev.data.channel !== undefined) {
         const handler = this.runHandlers[ev.data.channel];
         handler.resolve(ev.data.payload);
         return;
@@ -204,4 +246,20 @@ class Provider<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
   }
 }
 
+export type {
+  EventsMap,
+  EventNames,
+  EventParams,
+  UserEventNames,
+  UserListener,
+  PromiseWrapper,
+  PureFunction,
+  InferParams,
+  Callback,
+  KeysOfType,
+  WorkerInstance,
+  Message,
+};
+
 export { Processor, Provider };
+

@@ -3,10 +3,10 @@
   "version": "0.0.1.alpha-1",
   "description": "SocketIO Style Web Worker Framework",
   "main": "build/index.js",
-  "types": "build/types/index.d.ts",
+  "types": "build/index.d.ts",
   "scripts": {
     "dev": "webpack serve --config webpack.config.dev.js",
-    "build": "webpack --config webpack.config.prod.js && tsc",
+    "build": "webpack --config webpack.config.prod.js && tsc --project tsconfig.build.json",
     "cy:open": "cypress open",
     "cy:run": "cypress run"
   },
@@ -42,13 +42,12 @@
     "prettier": "^3.5.0",
     "style-loader": "^4.0.0",
     "terser-webpack-plugin": "^5.3.11",
+    "tsconfig-paths-webpack-plugin": "^4.2.0",
     "typescript": "^5.7.3",
     "webpack": "^5.97.1",
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "5.2.0",
-    "worker-loader": "^3.0.8"
-  },
-  "dependencies": {
+    "worker-loader": "^3.0.8",
     "lodash": "^4.17.21"
   }
 }
