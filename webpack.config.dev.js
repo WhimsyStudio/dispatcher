@@ -7,6 +7,7 @@ module.exports = {
     basic:'./src/test/basic/index.ts',
     run:'./src/test/run/index.ts',
     thirdparty:'./src/test/thirdparty/index.ts',
+    timeout:'./src/test/timeout/index.ts',
   },
   output: {
     filename: '[name].[hash].js',
@@ -31,6 +32,12 @@ module.exports = {
         exclude: /(node_modules|bower_components)/,
         use: {
           loader: 'babel-loader',
+          options: {
+            presets: [
+              '@babel/preset-env',
+              '@babel/preset-typescript'
+            ]
+          }
         },
       },
       {
@@ -44,7 +51,15 @@ module.exports = {
               inline: 'fallback',
             },
           },
-          'babel-loader',
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                '@babel/preset-env',
+                '@babel/preset-typescript'
+              ]
+            }
+          }
         ],
       },
     ],
@@ -67,6 +82,12 @@ module.exports = {
       template: './src/index.html',
       filename:'thirdparty.html',
       chunks: ['thirdparty']
+    }),
+    new HtmlWebpackPlugin({
+      title: 'Dispatcher',
+      template: './src/index.html',
+      filename:'timeout.html',
+      chunks: ['timeout']
     }),
   ],
   resolve: {

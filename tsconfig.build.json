@@ -3,7 +3,7 @@
       "baseUrl": ".",
       "noImplicitAny": true,
       "outDir": "./build/@wsys/dispatcher",
-      "declarationDir": "./build/@wsys/dispatcher",
+      "declarationDir": "./build/@wsys/dispatcher/types",
       "module": "esnext",
       "target": "es5",
       "allowJs": true,

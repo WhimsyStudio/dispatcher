@@ -148,15 +148,21 @@ class Provider<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
    */
   commit<K extends KeysOfType<OutputEvents>>(
     ev: K,
-    arg: InferParams<OutputEvents, K>,
+    arg?: InferParams<OutputEvents, K>,
+    opts?: { timeout?: number },
   ): OutputEvents[K] extends PureFunction
     ? PromiseWrapper<ReturnType<OutputEvents[K]>>
     : never {
     let channel = Math.max(Object.keys(this.promiseHandlers).length, 0);
     channel = !channel ? channel : channel + 1;
-    return new Promise((r, _j) => {
+    return new Promise((r, j) => {
       this.promiseHandlers[channel] = r;
       this.worker.postMessage({ ev: ev, payload: arg, channel });
+      if(opts && opts.timeout){
+         setTimeout(()=>{
+            j(new TaskTimeoutError(`Task exceeded ${opts.timeout}ms`))
+         },opts.timeout)
+      }
     }) as any;
   }
 
@@ -179,7 +185,7 @@ class Provider<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
    */
   emit<Ev extends EventNames<OutputEvents>>(
     ev: Ev,
-    ...arg: EventParams<OutputEvents, Ev>
+    arg: EventParams<OutputEvents, Ev>,
   ): void {
     this.worker.postMessage({ ev, payload: arg });
   }
@@ -199,7 +205,7 @@ class Provider<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
       } & Array<any>
     ) => T,
     params?: Readonly<[...D]>,
-    opts?: { executionTimeoutMs?: number },
+    opts?: { timeout?: number },
   ): Promise<T> & ExtraReturnFields {
     let capturedReject: undefined | ((e: unknown) => void);
     const promise: Promise<T> & Partial<ExtraReturnFields> = new Promise(
@@ -215,15 +221,11 @@ class Provider<InputEvents extends EventsMap, OutputEvents extends EventsMap> {
           this.runHandlers[channel] = { reject, resolve };
           const funcStr = `Promise.all(arguments[0]).then(deps => (${func.toString()})(...deps)).then(r=>postMessage({ev:'RUN_RES',payload:r,channel:${channel}})).catch(e=>postMessage({$__error:e}))`;
 
-          if (opts?.executionTimeoutMs != null) {
+          if (opts?.timeout != null) {
             setTimeout(
               () =>
-                reject(
-                  new TaskTimeoutError(
-                    `Task exceeded ${opts.executionTimeoutMs}ms`,
-                  ),
-                ),
-              opts.executionTimeoutMs,
+                reject(new TaskTimeoutError(`Task exceeded ${opts.timeout}ms`)),
+              opts.timeout,
             );
           }
 
@@ -262,4 +264,3 @@ export type {
 };
 
 export { Processor, Provider };
-

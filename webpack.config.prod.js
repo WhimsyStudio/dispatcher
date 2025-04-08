@@ -4,6 +4,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const packageInfo = require('./package.json');
 const { version, name, license, repository, author } = packageInfo;
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const { merge } = require('webpack-merge');
 
 const banner = `
   ${name} v${version}
@@ -14,20 +15,15 @@ const banner = `
   This source code is licensed under the ${license} license.
 `;
 
-module.exports = {
+const common = {
   mode: 'production',
   devtool: 'source-map',
   entry: './src/lib/dispatcher/index.ts',
-  output: {
-    filename: 'index.js',
-    path: path.resolve(__dirname, 'build/@wsys/dispatcher'),
-    library: name,
-    libraryTarget: 'umd',
-    clean: true,
-  },
+
   optimization: {
     minimize: true,
     minimizer: [new TerserPlugin({
+      parallel: 4,
       extractComments: false,
       terserOptions: {
         format: {
@@ -35,6 +31,25 @@ module.exports = {
         },
       }
     })],
+  },
+ 
+  plugins: [new webpack.BannerPlugin(banner)],
+  resolve: {
+    extensions: ['.ts', '.js', '.json'],
+    plugins: [
+      new TsconfigPathsPlugin({
+        configFile: path.resolve(__dirname, 'tsconfig.build.json'),
+      }),
+    ],
+  },
+};
+const umd = {
+  output: {
+    filename: 'index.umd.js',
+    path: path.resolve(__dirname, 'build/@wsys/dispatcher/dist'),
+    library: 'Dispatcher',
+    libraryTarget: 'umd',
+    clean: true,
   },
   module: {
     rules: [
@@ -48,20 +63,46 @@ module.exports = {
           options: {
             presets: [
               '@babel/preset-env',
-              '@babel/preset-typescript',
-            ],
-          },
+              '@babel/preset-typescript'
+            ]
+          }
         },
       },
     ],
   },
-  plugins: [new webpack.BannerPlugin(banner)],
-  resolve: {
-    extensions: ['.ts', '.js', '.json'],
-    plugins: [
-      new TsconfigPathsPlugin({
-        configFile: path.resolve(__dirname, 'tsconfig.build.json'),
-      }),
+} 
+const esm = {
+  experiments: {
+    outputModule: true 
+  },
+  output: {
+    filename: 'index.esm.js',
+    path: path.resolve(__dirname, 'build/@wsys/dispatcher/dist'),
+    library: {
+      type: 'module'
+    },
+    clean: true,
+  },
+  module: {
+    rules: [
+      {
+        test: /\.([mjt])s$/,
+        exclude: [
+          /(node_modules|bower_components)/,
+        ],
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+               ['@babel/preset-env', { modules: false }], 
+              '@babel/preset-typescript'
+            ]
+          }
+        },
+      },
     ],
   },
-};
+}
+const umdConfig = merge(common,umd)
+const esmConfig = merge(common,esm)
+module.exports = [umdConfig,esmConfig];

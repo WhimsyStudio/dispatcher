@@ -1,7 +1,16 @@
 {
     "name": "@wsys/dispatcher",
     "version": "0.0.1.alpha-1",
-    "description": "SocketIO Style Web Worker Framework",
-    "main": "index.js",
-    "types": "index.d.ts"
+    "description": "Tiny web wroker toolkit",
+    "main": "dist/index.umd.js",
+    "module": "dist/index.esm.js",
+    "types": "types/index.d.ts",
+    "author": "Okay6 (whimsystudio@163.com)",
+    "homepage": "https://gitee.com/whimsy_studio/dispatcher",
+    "keywords": [ "web worker"],
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://gitee.com/whimsy_studio/dispatcher"
+    }
 }
