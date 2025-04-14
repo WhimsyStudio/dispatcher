@@ -15,7 +15,7 @@
     "paths": {
       "@wsys/*": ["./src/lib/*"]
     },
-    "types": ["cypress","jquery"]
+    "types": ["cypress","jquery","bun"]
   },
   "include": ["src/**/*.ts", "cypress"],
   "exclude": ["node_modules"]

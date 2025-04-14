@@ -4,11 +4,11 @@ module.exports = {
   mode: 'development',
   devtool: 'cheap-module-source-map',
   entry: {
-    basic:'./src/test/basic/index.ts',
-    run:'./src/test/run/index.ts',
-    thirdparty:'./src/test/thirdparty/index.ts',
-    timeout:'./src/test/timeout/index.ts',
-    parameter:'./src/test/parameter/index.ts',
+    basic:'./src/__tests__/browser/basic/index.ts',
+    run:'./src/__tests__/browser/run/index.ts',
+    thirdparty:'./src/__tests__/browser/thirdparty/index.ts',
+    timeout:'./src/__tests__/browser/timeout/index.ts',
+    parameter:'./src/__tests__/browser/parameter/index.ts',
   },
   output: {
     filename: '[name].[hash].js',
