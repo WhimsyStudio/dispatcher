@@ -2,7 +2,7 @@ import { Provider } from '@wsys/dispatcher';
 // eslint-disable-next-line
 // @ts-expect-error
 import Worker from './index.worker';
-import * as $ from 'jquery';
+import { pinTestResult } from '../../utils';
 (async () => {
   const provider = new Provider<{}, {}>(new Worker());
   const res = await provider.run(
@@ -10,6 +10,6 @@ import * as $ from 'jquery';
       return n * 2;
     },
     [20],
-  ).future
-  $(document.body).append(`<span id="test-res">${res}<span>`);
+  ).future;
+  pinTestResult(res);
 })();
