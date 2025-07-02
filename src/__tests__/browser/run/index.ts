@@ -4,7 +4,7 @@ import { Provider } from '@wsys/dispatcher';
 import Worker from './index.worker';
 import { pinTestResult } from '../../utils';
 (async () => {
-  const provider = new Provider<{}, {}>(new Worker());
+  const provider =  Provider.create<{}, {}>(new Worker());
   const res = await provider.run(
     (n) => {
       return n * 2;
