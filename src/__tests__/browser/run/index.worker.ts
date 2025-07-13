@@ -1,3 +1,3 @@
-import { Processor } from "@ws/dispatcher";
+import { Processor } from "@wsso/dispatcher";
 
 new Processor<{}, {}>();

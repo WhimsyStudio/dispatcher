@@ -1,4 +1,4 @@
-import { Provider } from '@ws/dispatcher';
+import { Provider } from '@wsso/dispatcher';
 import { expect, test } from 'bun:test';
 import { MEvents, WEvents } from './events';
 

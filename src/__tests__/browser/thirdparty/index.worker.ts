@@ -1,4 +1,4 @@
-import { Processor } from '@ws/dispatcher';
+import { Processor } from '@wsso/dispatcher';
 import { TestWorker } from './typing';
 import { multiply } from 'lodash';
 

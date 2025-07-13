@@ -1,4 +1,4 @@
-import { Provider } from '@ws/dispatcher';
+import { Provider } from '@wsso/dispatcher';
 // eslint-disable-next-line
 // @ts-expect-error
 import Worker from './index.worker';

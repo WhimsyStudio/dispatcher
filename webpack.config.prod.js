@@ -27,7 +27,7 @@ const common = {
       extractComments: false,
       terserOptions: {
         format: {
-          comments: /@ws\/dispatcher/
+          comments: /@wsso\/dispatcher/
         },
       }
     })],
@@ -46,7 +46,7 @@ const common = {
 const umd = {
   output: {
     filename: 'index.umd.js',
-    path: path.resolve(__dirname, 'build/@ws/dispatcher/dist'),
+    path: path.resolve(__dirname, 'build/@wsso/dispatcher/dist'),
     library: 'Dispatcher',
     libraryTarget: 'umd',
   },
@@ -76,7 +76,7 @@ const esm = {
   },
   output: {
     filename: 'index.esm.js',
-    path: path.resolve(__dirname, 'build/@ws/dispatcher/dist'),
+    path: path.resolve(__dirname, 'build/@wsso/dispatcher/dist'),
     library: {
       type: 'module'
     },

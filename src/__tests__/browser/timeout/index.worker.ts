@@ -1,4 +1,4 @@
-import { Processor } from '@ws/dispatcher';
+import { Processor } from '@wsso/dispatcher';
 import { MEvents, WEvents } from './events';
 
 const processor = new Processor<MEvents,WEvents>();
