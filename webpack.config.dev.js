@@ -95,7 +95,7 @@ module.exports = {
   ],
   resolve: {
     alias: {
-      '@wsso': path.resolve(__dirname,'src','lib'),
+      '@whsy': path.resolve(__dirname,'src','lib'),
     },
     extensions: ['.ts', '.js', '.json'],
   },

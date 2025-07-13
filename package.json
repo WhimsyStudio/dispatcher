@@ -1,11 +1,11 @@
 {
-  "name": "@wsso/dispatcher",
+  "name": "@whsy/dispatcher",
   "version": "v0.0.1-alpha.1",
   "description": "Tiny web wroker toolkit",
   "scripts": {
     "dev": "webpack serve --config webpack.config.dev.js",
     "build": "rimraf ./build && webpack --config webpack.config.prod.js && tsc --project tsconfig.build.json && npm run copy",
-    "copy": "copyfiles -f ./src/lib/package.json ./build/@wsso/dispatcher && copyfiles -f ./LICENSE ./build/@wsso/dispatcher",
+    "copy": "copyfiles -f ./src/lib/package.json ./build/@whsy/dispatcher && copyfiles -f ./LICENSE ./build/@whsy/dispatcher",
     "test:e2e-open": "cypress open",
     "test:e2e-headless": "cypress run",
     "test:native": "bun test",

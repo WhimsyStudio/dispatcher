@@ -1,8 +1,8 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "./build/@wsso/dispatcher",
-    "declarationDir": "./build/@wsso/dispatcher/types",
+    "outDir": "./build/@whsy/dispatcher",
+    "declarationDir": "./build/@whsy/dispatcher/types",
     "declaration": true,
   },
   "include": ["./src/lib"],
