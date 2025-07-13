@@ -1,7 +1,7 @@
-type  MEvents = {
-  DOUBLE_NUMBER: (n: number) => number;
+type MEvents = {
+  doubleNum: (n: number) => number;
 };
 type WEvents = {
-  DOUBLED_NUMBER: (n: number) => void;
+  doubledNum: (n: number) => void;
 };
 export { WEvents, MEvents };

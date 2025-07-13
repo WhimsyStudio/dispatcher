@@ -1,0 +1,5 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["./src/lib/dispatcher/index.ts"],
+  "out": "./docs"
+}

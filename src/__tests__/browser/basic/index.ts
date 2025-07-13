@@ -6,6 +6,6 @@ import { MEvents, WEvents } from './events';
 import { pinTestResult } from '../../utils';
 (async () => {
   const provider =  Provider.create<WEvents, MEvents>(new Worker());
-  const res = await provider.commit('DOUBLE_NUMBER', 20).future;
+  const res = await provider.doubleNum(20)
   pinTestResult(res);
 })();

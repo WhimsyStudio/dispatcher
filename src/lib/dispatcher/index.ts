@@ -1,15 +1,24 @@
+/**
+ * Task commit by Provider.commit
+ */
 type Task<T> = {
   future: Promise<T>;
   cancel: () => void;
 };
 
+/**
+ * Callback for reponse from worker
+ */
 type EventCallback<
   T extends (...args: any[]) => any,
-  Callback extends (...args: any[]) => any
+  Callback extends (...args: any[]) => any,
 > = T extends (...args: infer P) => void
   ? (...args: [...P, Callback, number]) => void
   : never;
 
+/**
+ * Map-like for defining events passed between main and web worker
+ */
 type EventPayload = {
   ev: string | symbol;
   payload: any;
@@ -17,20 +26,20 @@ type EventPayload = {
 };
 
 /**
- * @description Map-like for defining events passed between main and web worker
+ * Map-like for defining events passed between main and web worker
  */
 type EventMap = {
   [key: string | symbol]: (arg: any) => void;
 };
 
 /**
- * @description Utility type for defining extra attributes in web worker
+ * Utility type for defining extra attributes in web worker
  */
 type ExtWorker<ExtraAttrs extends { [key: string | symbol]: any }> =
   typeof globalThis & Worker & ExtraAttrs;
 
 /**
- * @description Provider instance which can communicate with web worker processor
+ * Provider instance which can communicate with web worker processor
  */
 type ProviderWorker<I extends EventMap, O extends EventMap> = Provider<I, O> & {
   [K in keyof O]: O[K] extends (...args: any[]) => any
@@ -41,7 +50,7 @@ type ProviderWorker<I extends EventMap, O extends EventMap> = Provider<I, O> & {
 class TaskTimeoutError extends Error {}
 
 /**
- * @description Works in web worker for process request from Provider.
+ * Works in web worker for process request from Provider.
  */
 class Processor<InputEvents extends EventMap, OutputEvents extends EventMap> {
   private readonly worker: Worker = (self || globalThis) as unknown as Worker;
@@ -49,9 +58,9 @@ class Processor<InputEvents extends EventMap, OutputEvents extends EventMap> {
 
   constructor() {
     this.worker.onmessage = (ev: MessageEvent<EventPayload>) => {
-      if (ev.data.ev === "RUN") {
+      if (ev.data.ev === 'RUN') {
         (async function () {}).constructor(ev.data.payload.funcStr)(
-          ev.data.payload.args
+          ev.data.payload.args,
         );
         return;
       }
@@ -75,7 +84,7 @@ class Processor<InputEvents extends EventMap, OutputEvents extends EventMap> {
           this.worker,
           Array.isArray(ev.data.payload) ? ev.data.payload[0] : ev.data.payload,
           emit,
-          ev.data.channel
+          ev.data.channel,
         );
       } else {
         this.handlers[ev.data.ev].call(this.worker, emit, ev.data.channel);
@@ -84,7 +93,9 @@ class Processor<InputEvents extends EventMap, OutputEvents extends EventMap> {
   }
 
   /**
-   * @description Setup listener for handling response from Initiator.
+   * Setup listener for handling response from Initiator.
+   * @param ev Event name
+   * @param listener Callback for listener
    */
   on<Ev extends keyof InputEvents & (string | symbol)>(
     ev: Ev,
@@ -94,13 +105,13 @@ class Processor<InputEvents extends EventMap, OutputEvents extends EventMap> {
         ev: Ev,
         ...arg: [...Parameters<OutputEvents[Ev]>, undefined | number]
       ) => void
-    >
+    >,
   ): void {
     this.handlers[ev] = listener;
   }
 }
 /**
- * @description Works in main javascript thread as callee.
+ * Works in main javascript thread as callee.
  */
 class Provider<InputEvents extends EventMap, OutputEvents extends EventMap> {
   private readonly worker!: Worker;
@@ -112,13 +123,13 @@ class Provider<InputEvents extends EventMap, OutputEvents extends EventMap> {
   private promiseHandlers: Record<number, Function> = {};
 
   static create<InputEvents extends EventMap, OutputEvents extends EventMap>(
-    worker: string | URL | Worker
+    worker: string | URL | Worker,
   ): ProviderWorker<InputEvents, OutputEvents> {
     const base = new Provider<InputEvents, OutputEvents>(worker);
 
     return new Proxy(base, {
       get(target, key, receiver) {
-        if (typeof key === "string" && key in target === false) {
+        if (typeof key === 'string' && key in target === false) {
           return (...args: any[]) =>
             target.commit(key as keyof OutputEvents, args[0]).future;
         }
@@ -134,7 +145,7 @@ class Provider<InputEvents extends EventMap, OutputEvents extends EventMap> {
       this.worker = new Worker(worker);
     }
     this.worker.onmessage = (ev: MessageEvent<EventPayload>) => {
-      if (ev.data.ev === "RUN_RES" && ev.data.channel !== undefined) {
+      if (ev.data.ev === 'RUN_RES' && ev.data.channel !== undefined) {
         const handler = this.runHandlers[ev.data.channel];
         handler.resolve(ev.data.payload);
         return;
@@ -142,7 +153,7 @@ class Provider<InputEvents extends EventMap, OutputEvents extends EventMap> {
       if (ev.data.channel !== undefined) {
         this.promiseHandlers[ev.data.channel].call(
           this.worker,
-          ev.data.payload
+          ev.data.payload,
         );
       } else {
         this.handlers[ev.data.ev].call(this.worker, ev.data.payload);
@@ -151,7 +162,7 @@ class Provider<InputEvents extends EventMap, OutputEvents extends EventMap> {
   }
 
   /**
-   * @description Call method in Processor in promise-like way.
+   * Call method in Processor in promise-like way.
    * @param ev Event to be fired
    * @param arg Execute Arguments
    */
@@ -160,7 +171,7 @@ class Provider<InputEvents extends EventMap, OutputEvents extends EventMap> {
     arg?: Parameters<OutputEvents[K]> extends Array<any>
       ? Parameters<OutputEvents[K]>[0]
       : never,
-    opts?: { timeout?: number }
+    opts?: { timeout?: number },
   ): OutputEvents[K] extends Function
     ? Task<ReturnType<OutputEvents[K]>>
     : never {
@@ -179,32 +190,31 @@ class Provider<InputEvents extends EventMap, OutputEvents extends EventMap> {
   }
 
   /**
-   * @description Setup listener for request from Processor.
+   * Setup listener for request from Processor.
    * @param ev Event to be fired
    * @param listener Callback for event
    */
   on<Ev extends keyof InputEvents & (string | symbol)>(
     ev: Ev,
-    listener: InputEvents[Ev]
+    listener: InputEvents[Ev],
   ) {
     this.handlers[ev] = listener;
   }
 
   /**
-   * @description Send request to Processor.
+   * Send request to Processor.
    * @param ev Event to be fired
    * @param arg Execute Arguments
    */
   emit<Ev extends keyof OutputEvents & (string | symbol)>(
     ev: Ev,
-    arg: Parameters<OutputEvents[Ev]>
+    arg: Parameters<OutputEvents[Ev]>,
   ): void {
     this.worker.postMessage({ ev, payload: arg });
   }
 
   /**
-   * @description Run function in webworker.
-   * @param task Function Prototype
+   * Run function in webworker.
    * @param params Function Parameters
    * @param opts  Runing Options
    */
@@ -217,7 +227,7 @@ class Provider<InputEvents extends EventMap, OutputEvents extends EventMap> {
       } & Array<any>
     ) => T,
     params?: Readonly<[...D]>,
-    opts?: { timeout?: number }
+    opts?: { timeout?: number },
   ): Task<T> {
     // eslint-disable-next-line no-async-promise-executor
     const promise: Promise<T> = new Promise(async (resolve, reject) => {
@@ -235,12 +245,12 @@ class Provider<InputEvents extends EventMap, OutputEvents extends EventMap> {
           setTimeout(
             () =>
               reject(new TaskTimeoutError(`Task exceeded ${opts.timeout}ms`)),
-            opts.timeout
+            opts.timeout,
           );
         }
 
         this.worker.postMessage({
-          ev: "RUN",
+          ev: 'RUN',
           payload: { funcStr, args },
           channel,
         });
@@ -252,5 +262,12 @@ class Provider<InputEvents extends EventMap, OutputEvents extends EventMap> {
   }
 }
 
-export type { EventMap, ExtWorker, Task, ProviderWorker };
-export { Processor, Provider };
+export type {
+  Task,
+  EventMap,
+  ExtWorker,
+  EventPayload,
+  ProviderWorker,
+  EventCallback,
+};
+export { Processor, Provider, TaskTimeoutError };

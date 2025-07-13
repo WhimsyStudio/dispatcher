@@ -8,17 +8,18 @@
     "copy": "copyfiles -f ./src/lib/package.json ./build/@wsys/dispatcher && copyfiles -f ./LICENSE ./build/@wsys/dispatcher",
     "test:e2e-open": "cypress open",
     "test:e2e-headless": "cypress run",
-    "test:native": "bun test"
+    "test:native": "bun test",
+    "doc": "typedoc --options ./typedoc.json "
   },
   "author": "Okay6 (whimsystudio@163.com)",
-  "homepage": "https://gitee.com/whimsy_studio/dispatcher",
+  "homepage": "www.whimsystudio.ct.ws/dispatcher",
   "keywords": [
     "web worker"
   ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://gitee.com/whimsy_studio/dispatcher"
+    "url": "https://gitee.com/whimsystudio/dispatcher"
   },
   "devDependencies": {
     "@babel/core": "^7.26.8",
@@ -46,10 +47,11 @@
     "rimraf": "^6.0.1",
     "terser-webpack-plugin": "^5.3.11",
     "tsconfig-paths-webpack-plugin": "^4.2.0",
+    "typedoc": "^0.28.7",
     "typescript": "^5.7.3",
     "webpack": "^5.97.1",
     "webpack-cli": "^6.0.1",
-    "webpack-dev-server": "5.2.0",
+    "webpack-dev-server": "^5.2.2",
     "worker-loader": "^3.0.8"
   }
 }
