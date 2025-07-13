@@ -27,7 +27,7 @@ const common = {
       extractComments: false,
       terserOptions: {
         format: {
-          comments: /@wsys\/dispatcher/
+          comments: /@ws\/dispatcher/
         },
       }
     })],

@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "webpack serve --config webpack.config.dev.js",
     "build": "rimraf ./build && webpack --config webpack.config.prod.js && tsc --project tsconfig.build.json && npm run copy",
-    "copy": "copyfiles -f ./src/lib/package.json ./build/@wsys/dispatcher && copyfiles -f ./LICENSE ./build/@wsys/dispatcher",
+    "copy": "copyfiles -f ./src/lib/package.json ./build/@ws/dispatcher && copyfiles -f ./LICENSE ./build/@ws/dispatcher",
     "test:e2e-open": "cypress open",
     "test:e2e-headless": "cypress run",
     "test:native": "bun test",

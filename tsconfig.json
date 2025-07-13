@@ -13,7 +13,7 @@
     "moduleResolution": "node",
     "skipLibCheck": true,
     "paths": {
-      "@wsys/*": ["./src/lib/*"]
+      "@ws/*": ["./src/lib/*"]
     },
     "types": ["cypress","jquery","bun"]
   },

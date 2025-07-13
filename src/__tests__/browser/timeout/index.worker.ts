@@ -1,4 +1,4 @@
-import { Processor } from '@wsys/dispatcher';
+import { Processor } from '@ws/dispatcher';
 import { MEvents, WEvents } from './events';
 
 const processor = new Processor<MEvents,WEvents>();
