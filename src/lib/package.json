@@ -11,6 +11,11 @@
   "keywords": [
     "web worker"
   ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "registry": "https://registry.npmjs.org/",
   "license": "MIT",
   "repository": {
     "type": "git",
