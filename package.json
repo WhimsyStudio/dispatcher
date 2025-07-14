@@ -5,14 +5,15 @@
   "scripts": {
     "dev": "webpack serve --config webpack.config.dev.js",
     "build": "rimraf ./build && webpack --config webpack.config.prod.js && tsc --project tsconfig.build.json && npm run copy",
-    "copy": "copyfiles -f ./src/lib/package.json ./build/@whsy/dispatcher && copyfiles -f ./LICENSE ./build/@whsy/dispatcher",
+    "copy": "copyfiles -f ./src/lib/package.json ./build/@whsy/dispatcher && copyfiles -f ./LICENSE ./build/@whsy/dispatcher && copyfiles -f ./README.md ./build/@whsy/dispatcher",
     "test:e2e-open": "cypress open",
     "test:e2e-headless": "cypress run",
     "test:native": "bun test",
     "doc": "typedoc --options ./typedoc.json",
     "publish": "npm publish --tag alpha --access public ./build/@whsy/dispatcher "
   },
-  "author": "Okay6 (whimsystudio@163.com)",
+  "author": "Jack Lee",
+  "email": "whimsystudio@163.com",
   "homepage": "www.whimsystudio.ct.ws/dispatcher",
   "keywords": [
     "web worker"

@@ -7,7 +7,7 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const { merge } = require('webpack-merge');
 
 const banner = `
-  ${name} v${version}
+  ${name} ${version}
   ${repository.url}
 
   Copyright (c) ${author.replace(/ *<[^)]*> */g, ' ')}.
