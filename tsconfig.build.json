@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "rootDir": "./src/lib/dispatcher",
     "outDir": "./build/@whsy/dispatcher",
     "declarationDir": "./build/@whsy/dispatcher/types",
     "declaration": true,

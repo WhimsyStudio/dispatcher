@@ -1,17 +1,17 @@
 {
   "name": "@whsy/dispatcher",
-  "version": "v0.0.1-alpha.3",
+  "version": "v0.0.1-alpha.4",
   "description": "Tiny web worker toolkit",
   "scripts": {
     "dev": "webpack serve --config webpack.config.dev.js",
-    "build": "rimraf ./build && webpack --config webpack.config.prod.js && tsc --project tsconfig.build.json && npm run copy",
+    "build": "rimraf ./build && webpack --config webpack.config.prod.js && tsc --project tsconfig.build.json && pnpm run copy",
     "copy": "copyfiles -f ./src/lib/package.json ./build/@whsy/dispatcher && copyfiles -f ./LICENSE ./build/@whsy/dispatcher && copyfiles -f ./README.md ./build/@whsy/dispatcher",
     "test:e2e-open": "cypress open",
     "test:e2e-headless": "cypress run",
     "test:native": "bun test",
     "doc": "typedoc --options ./typedoc.json",
     "doc:preview": "http-server ./docs",
-    "publish": "npm publish --tag alpha --access public ./build/@whsy/dispatcher"
+    "publish": "pnpm publish --tag alpha --access public ./build/@whsy/dispatcher"
   },
   "author": "Jack Lee",
   "email": "whimsystudio@163.com",
