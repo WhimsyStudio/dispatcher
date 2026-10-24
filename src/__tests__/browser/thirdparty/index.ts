@@ -2,11 +2,11 @@ import { Provider } from '@whsy/dispatcher';
 // eslint-disable-next-line
 // @ts-expect-error
 import Worker from './index.worker';
-import { TestWorker } from './typing';
+import type { TestWorker } from './typing';
 import { pinTestResult } from '../../utils';
 (async () => {
-  const provier =  Provider.create(new Worker())
-  const res = await provier.run(
+  const provider =  Provider.create(new Worker())
+  const res = await provider.run(
     (a, b) => {
       const worker = globalThis as TestWorker;
       return worker.multiply(a, b);

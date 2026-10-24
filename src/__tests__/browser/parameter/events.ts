@@ -6,4 +6,4 @@ type WEvents = {
   RETURN_TWO: (n: number) => void;
   HAND_SHAKE_OK:()=> void
 };
-export { MEvents, WEvents };
+export type { MEvents, WEvents };

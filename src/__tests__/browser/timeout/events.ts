@@ -4,5 +4,5 @@ type MEvents = {
 type WEvents = {
   TIMEOUT_TASK_OVER: () => void;
 };
-export { MEvents, WEvents };
+export type { MEvents, WEvents };
 

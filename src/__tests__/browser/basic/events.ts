@@ -4,4 +4,4 @@ type MEvents = {
 type WEvents = {
   doubledNum: (n: number) => void;
 };
-export { WEvents, MEvents };
+export type { WEvents, MEvents };
