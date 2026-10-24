@@ -1,16 +1,15 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "noImplicitAny": true,
     "outDir": "dist",
     "module": "esnext",
-    "target": "es5",
+    "target": "es2023",
     "allowJs": true,
     "sourceMap": true,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "lib": ["es2018", "dom", "WebWorker"],
-    "moduleResolution": "node",
+    "lib": ["ES2023", "DOM", "WebWorker"],
+    "moduleResolution": "bundler",
     "skipLibCheck": true,
     "paths": {
       "@whsy/*": ["./src/lib/*"]
