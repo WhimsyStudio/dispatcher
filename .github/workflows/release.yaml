@@ -65,6 +65,7 @@ jobs:
           EOF
           popd
           pnpm exec tsc --ignoreConfig --noEmit --strict --target ES2022 --module NodeNext --moduleResolution NodeNext --lib ES2022,DOM "$RUNNER_TEMP/dispatcher-package-smoke/consumer/package-smoke.mts"
-      - run: pnpm run publish
+      - name: Publish the verified release package
+        run: pnpm publish --tag latest --access public --no-git-checks ./build/@whsy/dispatcher
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
