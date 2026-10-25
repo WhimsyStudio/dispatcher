@@ -49,6 +49,7 @@ const umd = {
     path: path.resolve(__dirname, 'build/@whsy/dispatcher/dist'),
     library: 'Dispatcher',
     libraryTarget: 'umd',
+    globalObject: 'globalThis',
   },
   module: {
     rules: [
@@ -75,7 +76,7 @@ const esm = {
     outputModule: true 
   },
   output: {
-    filename: 'index.esm.js',
+    filename: 'index.esm.mjs',
     path: path.resolve(__dirname, 'build/@whsy/dispatcher/dist'),
     library: {
       type: 'module'

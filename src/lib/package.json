@@ -1,21 +1,39 @@
 {
   "name": "@whsy/dispatcher",
-  "version": "v0.0.1-alpha.4",
-  "description": "Tiny web worker toolkit",
-  "main": "dist/index.umd.js",
-  "module": "dist/index.esm.js",
-  "types": "types/index.d.ts",
+  "version": "0.0.1",
+  "description": "Typed request/response messaging for Web Workers",
+  "main": "./dist/index.umd.js",
+  "module": "./dist/index.esm.mjs",
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./dist/index.esm.mjs",
+      "require": "./dist/index.umd.js",
+      "default": "./dist/index.esm.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "types",
+    "README.md",
+    "README-zh.md",
+    "LICENSE",
+    "asset/logo.png"
+  ],
   "author": "Jack Lee",
   "email": "whimsystudio@163.com",
-  "homepage": "www.whimsystudio.ct.ws/dispatcher",
+  "homepage": "https://github.com/WhimsyStudio/dispatcher#readme",
   "keywords": [
-    "web worker"
+    "web worker",
+    "typescript",
+    "worker"
   ],
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
-  "registry": "https://registry.npmjs.org/",
   "license": "MIT",
   "repository": {
     "type": "git",

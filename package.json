@@ -1,28 +1,30 @@
 {
   "name": "@whsy/dispatcher",
-  "version": "v0.0.1-alpha.4",
-  "description": "Tiny web worker toolkit",
+  "version": "0.0.1",
+  "description": "Typed request/response messaging for Web Workers",
   "scripts": {
     "dev": "webpack serve --config webpack.config.dev.js",
     "build": "rimraf ./build && webpack --config webpack.config.prod.js && tsc --project tsconfig.build.json && pnpm run copy",
-    "copy": "copyfiles -f ./src/lib/package.json ./build/@whsy/dispatcher && copyfiles -f ./LICENSE ./build/@whsy/dispatcher && copyfiles -f ./README.md ./build/@whsy/dispatcher",
+    "copy": "copyfiles -f ./src/lib/package.json ./build/@whsy/dispatcher && copyfiles -f ./LICENSE ./build/@whsy/dispatcher && copyfiles -f ./README.md ./build/@whsy/dispatcher && copyfiles -f ./README-zh.md ./build/@whsy/dispatcher && copyfiles -f ./asset/logo.png ./build/@whsy/dispatcher/asset",
     "test:e2e-open": "cypress open",
     "test:e2e-headless": "cypress run",
     "test:native": "bun test",
     "doc": "typedoc --options ./typedoc.json",
     "doc:preview": "http-server ./docs",
-    "publish": "pnpm publish --tag alpha --access public ./build/@whsy/dispatcher"
+    "publish": "pnpm publish --tag latest --access public ./build/@whsy/dispatcher"
   },
   "author": "Jack Lee",
   "email": "whimsystudio@163.com",
-  "homepage": "www.whimsystudio.ct.ws/dispatcher",
+  "homepage": "https://github.com/WhimsyStudio/dispatcher#readme",
   "keywords": [
-    "web worker"
+    "web worker",
+    "typescript",
+    "worker"
   ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://gitee.com/whimsystudio/dispatcher"
+    "url": "https://github.com/WhimsyStudio/dispatcher.git"
   },
   "devDependencies": {
     "@babel/core": "^8.0.7",
@@ -40,6 +42,7 @@
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.7",
+    "http-server": "^14.1.1",
     "html-webpack-plugin": "^5.6.8",
     "jquery": "^4.0.0",
     "lodash-es": "^4.18.1",
@@ -56,8 +59,5 @@
     "webpack-cli": "^7.2.3",
     "webpack-dev-server": "^6.1.0",
     "worker-loader": "^3.0.8"
-  },
-  "dependencies": {
-    "http-server": "^14.1.1"
   }
 }
