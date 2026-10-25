@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "rootDir": "./",
     "noImplicitAny": true,
     "outDir": "dist",
     "module": "esnext",
