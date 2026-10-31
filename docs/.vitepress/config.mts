@@ -29,9 +29,8 @@ export default defineConfig({
         },
       },
     },
-    '/zh-CN/': {
+    'zh-CN': {
       label: '简体中文',
-      link: '/zh-CN/',
       lang: 'zh-CN',
       title: 'Dispatcher',
       description: '用于 Web Worker 的类型安全请求与响应通信',
