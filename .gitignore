@@ -23,4 +23,14 @@ yarn-error.log*
 dist
 build
 cypress/report/*
-docs
+
+# Generated documentation output
+/docs/.vitepress/cache/
+/docs/.vitepress/dist/
+/docs/public/api/
+/docs/.nojekyll
+/docs/assets/
+/docs/classes/
+/docs/types/
+/docs/hierarchy.html
+/docs/index.html

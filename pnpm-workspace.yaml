@@ -1,3 +1,4 @@
 allowBuilds:
   bun: true
   cypress: true
+  esbuild: true

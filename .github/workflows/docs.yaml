@@ -30,12 +30,12 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Build API documentation
-        run: pnpm doc
+      - name: Build documentation site
+        run: pnpm docs:build
       - name: Prepare Pages artifact
         run: |
           mkdir -p _site/docs
-          cp -R docs/. _site/docs/
+          cp -R docs/.vitepress/dist/. _site/docs/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

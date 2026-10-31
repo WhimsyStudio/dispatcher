@@ -202,15 +202,16 @@ provider.onError((error, channel) => {
 使用 `offError` 移除错误监听器。与请求关联的错误会使对应的 `future` 拒绝；
 Worker 级别的错误也会通知已注册的错误监听器。
 
-## API 文档
+## 文档
 
-可在本地生成 TypeDoc API 文档：
+文档站包含使用指南、示例和自动生成的 API 参考。启动本地预览：
 
 ```sh
-npm run doc
+pnpm docs:dev
 ```
 
-生成的文档位于 `docs/`。
+使用 `pnpm docs:build` 构建文档站。发布后的文档位于
+<https://whimsystudio.github.io/dispatcher/docs/>。
 
 ## 许可证
 

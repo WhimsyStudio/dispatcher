@@ -212,15 +212,16 @@ Remove it with `offError`. Errors associated with a request reject that
 request's `future`; worker-level errors also reach the registered error
 listeners.
 
-## API reference
+## Documentation
 
-Generate the TypeDoc API reference locally:
+The documentation site includes user guides, examples, and the generated API reference:
 
 ```sh
-npm run doc
+pnpm docs:dev
 ```
 
-The generated site is written to `docs/`.
+Build the site with `pnpm docs:build`. The published documentation is available at
+<https://whimsystudio.github.io/dispatcher/docs/>.
 
 ## License
 
